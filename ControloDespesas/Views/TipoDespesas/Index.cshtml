@@ -1,0 +1,90 @@
+﻿@model IEnumerable<ControloDespesas.Models.TipoDespesas>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<div class="tabela">
+    <div class="container">
+        <p class="btnNovo">
+            <a asp-action="Create" class="btn btn-primary">Novo Tipo de Despesa</a>
+        </p>
+        @if (TempData["Confirmacao"]!=null)
+        {
+            <h6 class="alert alert-success">@TempData["Confirmacao"]</h6>
+        }
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Nome)
+                    </th>
+                    <th>Opções</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Nome)
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.TipoDespesaID" class="btn btn-info">Actualizar</a> |
+                            
+                            <a onclick="ExibirModal(@item.TipoDespesaID,'@item.Nome')" class="btn btn-danger">Excluir</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Excluir</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Deseja Prosseguir com a exlusão de <text class="nome"></text>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btnExcluir">Sim</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Não</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{ 
+<script>
+    function ExibirModal(id, nome) {
+        $(".nome")[0].innerHTML = nome;
+        $(".modal").modal();
+
+        $(".btnExcluir").on('click', function () {
+            $.ajax({
+                url: "TipoDespesas/Delete",
+                method: "Post",
+                data: { id: id },
+                success: function (data) {
+                    $(".modal").modal('hide');
+                    location.reload(true);
+                }
+              });
+        });        
+            
+    }
+
+
+</script>
+
+
+}
+
