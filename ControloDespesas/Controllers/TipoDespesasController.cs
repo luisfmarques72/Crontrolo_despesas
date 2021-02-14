@@ -18,18 +18,32 @@ namespace ControloDespesas.Controllers
             _context = context;
         }
 
-        // GET: TipoDespesas
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             return View(await _context.TipoDespesas.ToListAsync());
         }
 
-       
+        [HttpPost]
+        public async Task<IActionResult> Index(string txtProcurar)
+        {
+            if (!string.IsNullOrEmpty(txtProcurar))
+                return View(await _context.TipoDespesas.Where(td=>td.Nome.ToUpper().Contains(txtProcurar.ToUpper())).ToListAsync());
 
-        // GET: TipoDespesas/Create
-        public IActionResult Create()
+                return View(await _context.TipoDespesas.ToListAsync());
+        }
+
+            // GET: TipoDespesas/Create
+            public IActionResult Create()
         {
             return View();
+        }
+
+        public async Task<JsonResult> TipoDespesaExiste(string Nome)
+        {
+            if (await _context.TipoDespesas.AnyAsync(td => td.Nome.ToUpper() == Nome.ToUpper()))
+                return Json("Esse tipo de despesa já existe");
+            return Json(true);
         }
 
         // POST: TipoDespesas/Create
@@ -81,6 +95,7 @@ namespace ControloDespesas.Controllers
 
             if (ModelState.IsValid)
             {
+                
                 try
                 {
                     TempData["confirmacao"] = tipoDespesas.Nome + " foi cadastrado com sucesso.";

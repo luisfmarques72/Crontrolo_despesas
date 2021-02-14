@@ -1,21 +1,23 @@
-﻿@model IEnumerable<ControloDespesas.Models.TipoDespesas>
+﻿@model IEnumerable<ControloDespesas.Models.Salarios>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Salarios Cadastrados";
 }
-
 
 <div class="tabela">
     <div class="container">
-        <p class="btnNovo">
-            <a asp-action="Create" class="btn btn-primary">Novo Tipo de Despesa</a>
+        <h6>Salários Cadastrados</h6>
+        <p>
+            <a asp-action="Create" class="btn btn-primary">Novo Salário</a>
         </p>
-        @if (TempData["Confirmacao"]!=null)
+        @if (TempData["Confirmacao"] != null)
         {
-            <h6 class="alert alert-success">@TempData["Confirmacao"]</h6>
+            <div class="alert alert-success">
+                @TempData["Confimacao"]
+            </div>
         }
 
-        <form asp-action="Index" asp-controller="TipoDespesas" metoh="Post">
+        <form asp-action="Index" asp-controller="Salarios" metoh="Post">
             <div class="form-group">
                 <div class="input-group col-md-6">
                     <input class="form-control" name="txtProcurar" />
@@ -26,13 +28,18 @@
 
             </div>
         </form>
+
+
         <table class="table table-hover">
             <thead>
                 <tr>
                     <th>
-                        @Html.DisplayNameFor(model => model.Nome)
+                        @Html.DisplayNameFor(model => model.Meses)
                     </th>
-                    <th>Opções</th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.valor)
+                    </th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -40,12 +47,15 @@
                 {
                     <tr>
                         <td>
-                            @Html.DisplayFor(modelItem => item.Nome)
+                            @Html.DisplayFor(modelItem => item.Meses.Nome)
                         </td>
                         <td>
-                            <a asp-action="Edit" asp-route-id="@item.TipoDespesaID" class="btn btn-info">Actualizar</a> |
-                            
-                            <a onclick="ExibirModal(@item.TipoDespesaID,'@item.Nome')" class="btn btn-danger">Excluir</a>
+                            @Html.DisplayFor(modelItem => item.valor)
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.SalarioId">Actualizar</a> |
+                            <a onclick="ExibirModal(@item.SalarioId)" class="btn btn-danger">Excluir</a>
+
                         </td>
                     </tr>
                 }
@@ -53,7 +63,7 @@
         </table>
     </div>
 </div>
-
+<!----MODAL APAGA-->
 <div class="modal" tabindex="-1" role="dialog" data-backdrop="static">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -64,7 +74,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p>Deseja Prosseguir com a exlusão de <text class="nome"></text>.</p>
+                <p>Deseja Prosseguir com a exlusão do Salário.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary btnExcluir">Sim</button>
@@ -74,28 +84,26 @@
     </div>
 </div>
 
-@section Scripts{ 
-<script>
-    function ExibirModal(id, nome) {
-        $(".nome")[0].innerHTML = nome;
-        $(".modal").modal();
+@section Scripts{
+    <script>
+        function ExibirModal(id) {
+            $(".modal").modal();
+            $(".btnExcluir").on('click', function () {
+                $.ajax({
+                    url: "Salarios/Delete",
+                    method: "Post",
+                    data: { id: id },
+                    success: function (data) {
+                        $(".modal").modal('hide');
+                        location.reload(true);
+                    }
+                });
+            });
 
-        $(".btnExcluir").on('click', function () {
-            $.ajax({
-                url: "TipoDespesas/Delete",
-                method: "Post",
-                data: { id: id },
-                success: function (data) {
-                    $(".modal").modal('hide');
-                    location.reload(true);
-                }
-              });
-        });        
-            
-    }
+        }
 
 
-</script>
+    </script>
 
 
 }

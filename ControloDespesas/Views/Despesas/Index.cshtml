@@ -1,0 +1,133 @@
+﻿@model X.PagedList.IPagedList<ControloDespesas.Models.Despesas>
+@using X.PagedList.Mvc.Common
+@using X.PagedList.Mvc.Core
+
+@{
+    ViewData["Title"] = "Despesas Cadastradas";
+}
+
+<div class="tabela">
+    <div class="container">
+        <p>
+            <a asp-action="Create" class="btn btn-primary">Nova Despesa</a>
+        </p>
+
+        @if (TempData["Confirmacao"] != null)
+        {
+            <h6 class="alert alert-success">@TempData["Confirmacao"]</h6>
+        }
+
+        <div class="row text-justify">
+            <div class="row">
+                <label class="col-sm-3">Mes</label>
+                <div class="col-sm-3">
+                    <select class="form-control escolhaMes" asp-items="ViewBag.Meses"></select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col">
+                <partial name="_GastoTotalMes" />
+            </div>
+
+        </div>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        Meses
+                    </th>
+                    <th>
+                        Tipo da Despesa
+                    </th>
+                    <th>
+                        Valor
+                    </th>
+                    <th>
+                        Ação
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Meses.Nome)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.TipoDespesas.Nome)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Valor)
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.DespesaId">Atualizar</a> |
+                            <a onclick="ExibirModal(@item.DespesaId)" class="btn btn-danger">Excluir</a>
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@Html.PagedListPager(Model, pagina => Url.Action("Index", "Despesas", new { pagina }), new PagedListRenderOptionsBase
+{
+    LiElementClasses = new string[] { "page-item" },
+    PageClasses = new string[] { "page-link" }
+})
+
+<!----MODAL APAGA-->
+<div class="modal" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Excluir</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Deseja Prosseguir com a exlusão da Despesa.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btnExcluir">Sim</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Não</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+   
+    <script src="~/lib/bootstrap/dist/js/totalMes.js"></script>
+    <script>
+
+        CarregarDadosGastosTotaisMes();
+
+        function ExibirModal(id) {
+            $(".modal").modal();
+            $(".btnExcluir").on('click', function () {
+                $.ajax({
+                    url: "Despesas/Delete",
+                    method: "Post",
+                    data: { id: id },
+                    success: function (data) {
+                        $(".modal").modal('hide');
+                        location.reload(true);
+                    }
+                });
+            });
+
+        }
+
+
+    </script>
+
+
+}
+
+
